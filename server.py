@@ -10,13 +10,20 @@ db = cluster['gh']['users']
 
 @app.get('/')
 async def root():
+  """ returns list of users' name and email """
   cursor = db.find()
-  lst = []
+  obj = {}
   for c in cursor:
-    lst.append(c['_id'])
-  print(type(lst[0]))
-  return {"message": "Hello World", "otherkey":1, 3:'othervalue'}
+    obj.update({str(c['_id']): [c['name'], c['email']]})
+  return obj
 
 @app.get('/user/{user_id}')
-async def read_user(user_id):
-  return {'user id': user_id}
+async def get_user(user_id):
+  c = db.find_one({'name':user_id})
+  return {str(c['_id']): [c['name'], c['email'], c['zip']]}
+
+@app.put('/user/{user_id}')
+async def update_user(user_id):
+  c = db.find_one_and_update({'name':user_id}, {'$set': {'zip':75206}})
+  return {str(c['_id']): [c['name'], c['email']]}
+
