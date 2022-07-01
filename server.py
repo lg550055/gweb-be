@@ -29,12 +29,11 @@ async def root():
     obj.update({str(c['_id']): [c['name'], c['email']]})
   return obj
 
-@app.post('/user/')
+@app.post('/user/', status_code=201)
 async def create_user(user: User):
   user = jsonable_encoder(user)
-  c = db.insert_one(user)
-  # return {str(c['_id']): [c['name'], c['email'], c['zipcode']]}
-  return 'ok'
+  db.insert_one(user)
+  return {str(user['_id']): [user['name'], user['email'], user['zipcode']]}
 
 @app.get('/user/{user_id}')
 async def get_user(user_id):
