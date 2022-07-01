@@ -1,10 +1,9 @@
+from fastapi.encoders import jsonable_encoder
 from datetime import datetime
 from fastapi import FastAPI
 from pymongo import MongoClient
 from pydantic import BaseModel
 
-
-app = FastAPI()
 
 # TODO - move to env variable
 cluster = MongoClient('mongodb+srv://pologonz:hardtoguess@main.mks0e.mongodb.net/gh?retryWrites=true&w=majority')
@@ -19,6 +18,8 @@ class User(BaseModel):
   # created: datetime.date
   # updated: datetime.date = None
 
+app = FastAPI()
+
 @app.get('/')
 async def root():
   """ returns list of users' name and email """
@@ -27,6 +28,13 @@ async def root():
   for c in cursor:
     obj.update({str(c['_id']): [c['name'], c['email']]})
   return obj
+
+@app.post('/user/')
+async def create_user(user: User):
+  user = jsonable_encoder(user)
+  c = db.insert_one(user)
+  # return {str(c['_id']): [c['name'], c['email'], c['zipcode']]}
+  return 'ok'
 
 @app.get('/user/{user_id}')
 async def get_user(user_id):
