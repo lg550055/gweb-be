@@ -3,10 +3,11 @@ from datetime import datetime
 from fastapi import FastAPI
 from pymongo import MongoClient
 from pydantic import BaseModel
+from decouple import config
 
 
-# TODO - move to env variable
-cluster = MongoClient('mongodb+srv://pologonz:hardtoguess@main.mks0e.mongodb.net/gh?retryWrites=true&w=majority')
+DB_URL = config('DB_URL')
+cluster = MongoClient(DB_URL)
 db = cluster['gh']['users']
 
 class User(BaseModel):
